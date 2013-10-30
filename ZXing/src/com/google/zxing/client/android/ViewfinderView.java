@@ -24,6 +24,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
@@ -81,6 +82,7 @@ public final class ViewfinderView extends View {
     if (cameraManager == null) {
       return; // not ready yet, early draw before done configuring
     }
+    cameraManager.setFramingViewSize(new Point(this.getWidth(), this.getHeight()));
     Rect frame = cameraManager.getFramingRect();
     if (frame == null) {
       return;

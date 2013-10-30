@@ -35,6 +35,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -134,6 +135,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
+    
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
     Window window = getWindow();
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

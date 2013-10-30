@@ -72,6 +72,17 @@ final class DecodeHandler extends Handler {
   private void decode(byte[] data, int width, int height) {
     long start = System.currentTimeMillis();
     Result rawResult = null;
+    // hack: rotate the image
+    byte[] rotatedData = new byte[data.length];
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++)
+            rotatedData[x * height + height - y - 1] = data[x + y * width];
+    }
+    int tmp = width; // Here we are swapping, that's the difference to #11
+    width = height;
+    height = tmp;
+    data = rotatedData;
+    // end of rotation
     PlanarYUVLuminanceSource source = activity.getCameraManager().buildLuminanceSource(data, width, height);
     if (source != null) {
       BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
@@ -92,7 +103,7 @@ final class DecodeHandler extends Handler {
       if (handler != null) {
         Message message = Message.obtain(handler, R.id.decode_succeeded, rawResult);
         Bundle bundle = new Bundle();
-        bundleThumbnail(source, bundle);        
+        bundleThumbnail(source, bundle);
         message.setData(bundle);
         message.sendToTarget();
       }
@@ -109,7 +120,7 @@ final class DecodeHandler extends Handler {
     int width = source.getThumbnailWidth();
     int height = source.getThumbnailHeight();
     Bitmap bitmap = Bitmap.createBitmap(pixels, 0, width, width, height, Bitmap.Config.ARGB_8888);
-    ByteArrayOutputStream out = new ByteArrayOutputStream();    
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
     bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
     bundle.putByteArray(DecodeThread.BARCODE_BITMAP, out.toByteArray());
     bundle.putFloat(DecodeThread.BARCODE_SCALED_FACTOR, (float) width / source.getWidth());

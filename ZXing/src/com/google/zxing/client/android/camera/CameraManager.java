@@ -50,6 +50,7 @@ public final class CameraManager {
   private AutoFocusManager autoFocusManager;
   private Rect framingRect;
   private Rect framingRectInPreview;
+  private Point framingViewSize;
   private boolean initialized;
   private boolean previewing;
   private int requestedFramingRectWidth;
@@ -252,11 +253,19 @@ public final class CameraManager {
         // Called early, before init even finished
         return null;
       }
+/*
       rect.left = rect.left * cameraResolution.x / screenResolution.x;
       rect.right = rect.right * cameraResolution.x / screenResolution.x;
       rect.top = rect.top * cameraResolution.y / screenResolution.y;
       rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;
+*/
+      rect.left = rect.left * cameraResolution.y / framingViewSize.x;
+      rect.right = rect.right * cameraResolution.y / framingViewSize.x;
+      rect.top = rect.top * cameraResolution.x / framingViewSize.y;
+      rect.bottom = rect.bottom * cameraResolution.x / framingViewSize.y;
       framingRectInPreview = rect;
+      Log.d(TAG, "framing rect: " + framingRect);
+      Log.d(TAG, "framing prvw: " + framingRectInPreview);
     }
     return framingRectInPreview;
   }
@@ -307,4 +316,7 @@ public final class CameraManager {
                                         rect.width(), rect.height(), false);
   }
 
+  public void setFramingViewSize(Point framingViewSize) {
+    this.framingViewSize = framingViewSize;
+  }
 }

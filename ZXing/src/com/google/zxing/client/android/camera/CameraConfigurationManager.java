@@ -64,14 +64,16 @@ final class CameraConfigurationManager {
     Display display = manager.getDefaultDisplay();
     int width = display.getWidth();
     int height = display.getHeight();
-    // We're landscape-only, and have apparently seen issues with display thinking it's portrait 
+    // We're landscape-only, and have apparently seen issues with display thinking it's portrait
     // when waking from sleep. If it's not landscape, assume it's mistaken and reverse them:
+/*
     if (width < height) {
       Log.i(TAG, "Display reports portrait orientation; assuming this is incorrect");
       int temp = width;
       width = height;
       height = temp;
     }
+*/
     screenResolution = new Point(width, height);
     Log.i(TAG, "Screen resolution: " + screenResolution);
     cameraResolution = findBestPreviewSizeValue(parameters, screenResolution);
@@ -127,6 +129,7 @@ final class CameraConfigurationManager {
     }
 
     parameters.setPreviewSize(cameraResolution.x, cameraResolution.y);
+    camera.setDisplayOrientation(90);
     camera.setParameters(parameters);
   }
 
@@ -233,7 +236,8 @@ final class CameraConfigurationManager {
       if (pixels < MIN_PREVIEW_PIXELS || pixels > MAX_PREVIEW_PIXELS) {
         continue;
       }
-      boolean isCandidatePortrait = realWidth < realHeight;
+//      boolean isCandidatePortrait = realWidth < realHeight;
+      boolean isCandidatePortrait = realWidth < realHeight ^ screenResolution.x < screenResolution.y;
       int maybeFlippedWidth = isCandidatePortrait ? realHeight : realWidth;
       int maybeFlippedHeight = isCandidatePortrait ? realWidth : realHeight;
       if (maybeFlippedWidth == screenResolution.x && maybeFlippedHeight == screenResolution.y) {
@@ -242,7 +246,9 @@ final class CameraConfigurationManager {
         return exactPoint;
       }
       float aspectRatio = (float) maybeFlippedWidth / (float) maybeFlippedHeight;
-      float newDiff = Math.abs(aspectRatio - screenAspectRatio);
+//      float newDiff = Math.abs(aspectRatio - screenAspectRatio);
+//      float newDiff = Math.abs(screenResolution.y * supportedHeight - supportedWidth * screenResolution.x);
+      float newDiff = Math.abs(screenResolution.y * realHeight - realWidth * screenResolution.x);
       if (newDiff < diff) {
         bestSize = new Point(realWidth, realHeight);
         diff = newDiff;
